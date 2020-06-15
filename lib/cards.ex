@@ -1,16 +1,6 @@
 defmodule Cards do
   @moduledoc """
-  Documentation for `Cards`.
-  """
-
-  @doc """
-  Hello world.
-
-  ## Examples
-
-      iex> Cards.hello()
-      :world
-
+    Provides methods for creating and handling a deck of cards
   """
 
   def create_deck do
@@ -27,9 +17,56 @@ defmodule Cards do
     Enum.shuffle(deck)
   end
 
+  @doc """
+    Returns a boolean on whether a deck contains a given card
+
+  ## Examples
+      iex> deck = Cards.create_deck
+      iex> Cards.contains?(deck, "Ace of Spades")
+      true
+  """
   def contains?(deck, card) do
-    ## question mark above is just to show that this returns a boolean
     Enum.member?(deck, card)
+  end
+
+  @doc """
+    Divides a deck into a hand and remainder of the deck is hand size. The `hand_size`
+    argument indicates how many cards in the hand.
+
+  ## Examples
+      iex> deck = Cards.create_deck
+      iex> {hand, deck} = Cards.deal(deck, 1)
+      iex> hand
+      ["Ace of Spades"]
+  """
+  def deal(deck, hand_size) do
+    Enum.split(deck, hand_size)
+  end
+
+  @doc """
+    Saves deck to the filesystem
+
+  ## Examples
+      iex> deck = Cards.create_deck
+      iex> Cards.save(deck, "my_deck")
+      :ok
+  """
+  def save(deck, filename) do
+    binary = :erlang.term_to_binary(deck)
+    File.write(filename, binary)
+  end
+
+  def load(file) do
+    case File.read(file) do
+      { :ok, binary } -> :erlang.binary_to_term(binary)
+      { :error, _reason } -> "That file does not exist"
+    end
+  end
+
+  def create_hand(hand_size) do
+    Cards.create_deck
+    |> Cards.shuffle
+    |> Cards.deal(hand_size)
   end
 
 end
